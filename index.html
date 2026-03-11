@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>₹ Rupee Value — India's Money Power Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080808;--s1:#111;--s2:#181818;--s3:#202020;
+  --brd:#252525;--brd2:#2e2e2e;
+  --txt:#EEEAE3;--muted:#5C5C5C;--muted2:#888;
+  --gold:#E8A020;--gold2:#F5C842;--gold3:#7A5010;
+  --green:#2ECC71;--red:#E74C3C;--blue:#3498DB;--purple:#9B59B6;
+  --land:#27AE60;--usd:#2980B9;--g24:#C0A060;--g22:#E8A020;
+  /* mapping new vars to old for compatibility */
+  --saffron:#E8A020;--saffron2:#F5C842;--saffron-pale:rgba(232,160,32,.08);
+  --navy:#3498DB;--navy2:#5DADE2;--navy-pale:rgba(52,152,219,.07);
+  --teal:#2ECC71;--teal-pale:rgba(46,204,113,.07);
+  --crimson:#E74C3C;--crimson-pale:rgba(231,76,60,.08);
+  --ink:#EEEAE3;--ink2:#ccc;--ink3:#aaa;
+  --cream:#111;--cream2:#181818;--cream3:#202020;
+  --parchment:#2e2e2e;--dust:#888;--mist:#5C5C5C;--fog:#333;
+  --r:8px;--r2:10px;--r3:14px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--txt);font-family:'Sora',sans-serif;overflow-x:hidden;line-height:1.6;}
+body::after{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--s1);}
+::-webkit-scrollbar-thumb{background:var(--brd2);border-radius:3px;}
+
+/* ── NAV ── */
+.nav{position:sticky;top:0;z-index:300;height:58px;
+  background:rgba(8,8,8,0.95);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--brd);
+  display:flex;align-items:center;justify-content:space-between;padding:0 2rem;}
+.nav-brand{display:flex;align-items:center;gap:10px;}
+.nav-rupee{width:30px;height:30px;background:var(--gold);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.95rem;color:#080808;}
+.nav-name{font-family:'Libre Baskerville',serif;font-size:1.1rem;font-weight:700;color:var(--gold);}
+.nav-right{display:flex;align-items:center;gap:16px;}
+.nav-live{display:flex;align-items:center;gap:6px;font-size:.68rem;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--green);}
+.live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+.nav-date{font-size:.68rem;color:var(--muted2);border-left:1px solid var(--brd);padding-left:16px;}
+
+/* ── MASTHEAD (hero) ── */
+.masthead{padding:72px 2rem 56px;max-width:960px;margin:0 auto;text-align:center;position:relative;}
+.masthead::before{display:none;}
+.masthead-inner{position:relative;}
+.masthead-kicker{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--brd2);border-radius:20px;padding:5px 16px;font-size:.72rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);margin-bottom:24px;}
+.masthead-kicker::after{display:none;}
+.masthead h1{font-family:'Libre Baskerville',serif;font-size:clamp(2.2rem,5.5vw,4.4rem);line-height:1.06;letter-spacing:-2px;margin-bottom:18px;color:var(--txt);}
+.masthead h1 em{font-style:italic;color:var(--gold);}
+.masthead-sub{font-size:1rem;color:var(--muted2);line-height:1.75;max-width:600px;margin:0 auto 36px;font-weight:300;}
+
+/* ticker strip styled as hero-chips */
+.ticker-strip{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:24px;}
+.ticker-item{display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--brd2);border-radius:20px;padding:7px 14px;font-size:.74rem;font-weight:600;color:var(--txt);}
+.tick-label{font-size:.65rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted2);}
+.tick-val{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--txt);}
+.tick-change{font-size:.68rem;font-weight:700;}
+.tc-up{color:var(--green);}.tc-dn{color:var(--red);}
+
+.asset-chips{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:24px;}
+.achip{display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--brd2);border-radius:20px;padding:6px 13px;font-size:.73rem;font-weight:500;color:var(--muted2);}
+.achip-dot{width:7px;height:7px;border-radius:50%;}
+
+/* ── CALC CARD ── */
+.calc-wrap{max-width:900px;margin:0 auto;padding:0 1.5rem;transform:none;margin-bottom:40px;}
+.calc-card{background:var(--s1);border:1px solid var(--brd2);border-radius:18px;overflow:hidden;}
+.calc-card-top{padding:24px 28px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px;}
+.calc-card-title h2{font-family:'Libre Baskerville',serif;font-size:1.35rem;color:var(--txt);margin-bottom:4px;}
+.calc-card-title p{font-size:.82rem;color:var(--muted2);}
+.base-tag{background:rgba(232,160,32,.12);border:1px solid rgba(232,160,32,.25);color:var(--gold);border-radius:20px;padding:5px 14px;font-size:.7rem;font-weight:700;white-space:nowrap;flex-shrink:0;}
+.calc-card-body{padding:0 28px 26px;}
+.hint{background:rgba(52,152,219,.07);border:1px solid rgba(52,152,219,.2);border-radius:12px;padding:12px 16px;font-size:.78rem;color:rgba(52,152,219,.85);margin-bottom:18px;line-height:1.65;}
+.fields{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-bottom:16px;}
+@media(max-width:580px){.fields{grid-template-columns:1fr;}}
+.fg{display:flex;flex-direction:column;gap:6px;}
+.fg label{font-size:.65rem;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted2);}
+.fi-wrap{position:relative;}
+.fi-pre{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-family:'JetBrains Mono',monospace;color:var(--gold);font-size:.88rem;pointer-events:none;z-index:1;}
+.fg input,.fg select{width:100%;padding:12px 12px 12px 30px;background:var(--s2);border:1px solid var(--brd2);border-radius:10px;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:.9rem;appearance:none;transition:border-color .2s,box-shadow .2s;outline:none;}
+.fg select{padding-left:12px;cursor:pointer;}
+.fg input:focus,.fg select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,160,32,.1);}
+.go-btn{width:100%;padding:14px;background:var(--gold);color:#080808;border:none;border-radius:10px;font-family:'Sora',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;letter-spacing:.3px;display:flex;align-items:center;justify-content:center;gap:9px;transition:all .2s;position:relative;overflow:hidden;}
+.go-btn::before{display:none;}
+.go-btn span{position:relative;z-index:1;}
+.go-btn:hover{background:var(--gold2);transform:translateY(-1px);}
+
+/* ── PAGE ── */
+.page{max-width:1120px;margin:0 auto;padding:0 1.5rem 80px;}
+.sh{margin:48px 0 20px;padding-bottom:14px;border-bottom:1px solid var(--brd2);
+  display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.sh-kicker{font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+.sh h2{font-family:'Libre Baskerville',serif;font-size:1.6rem;letter-spacing:-.5px;color:var(--txt);}
+.sh p{font-size:.82rem;color:var(--muted2);margin-top:4px;}
+.sh-tag{background:rgba(46,204,113,.12);color:var(--green);border:1px solid rgba(46,204,113,.25);border-radius:20px;padding:4px 12px;font-size:.68rem;font-weight:700;letter-spacing:.5px;flex-shrink:0;}
+.src-bar{background:rgba(52,152,219,.07);border:1px solid rgba(52,152,219,.2);border-radius:12px;padding:13px 18px;font-size:.78rem;color:rgba(52,152,219,.85);line-height:1.7;margin-bottom:22px;display:flex;gap:9px;}
+.src-icon{font-size:.9rem;flex-shrink:0;margin-top:2px;}
+
+/* era grid */
+.era-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+@media(max-width:640px){.era-grid{grid-template-columns:1fr;}}
+.ecard{background:var(--s1);border:1px solid var(--brd2);border-radius:16px;padding:22px 20px;position:relative;transition:transform .2s,box-shadow .2s;}
+.ecard:hover{transform:translateY(-3px);box-shadow:0 16px 48px rgba(0,0,0,.5);}
+.ecard:not(:last-child){border-right:none;}
+.ecard-era{font-size:.62rem;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:4px;}
+.ecard.past .ecard-era{color:var(--blue);}
+.ecard.now .ecard-era{color:var(--gold);}
+.ecard.future .ecard-era{color:var(--green);}
+.ecard-yr{font-size:.78rem;color:var(--muted2);margin-bottom:12px;}
+.ecard-val{font-family:'JetBrains Mono',monospace;font-size:1.7rem;line-height:1;margin-bottom:10px;font-weight:600;}
+.ecard.past .ecard-val{color:var(--blue);}
+.ecard.now .ecard-val{color:var(--gold);}
+.ecard.future .ecard-val{color:var(--green);}
+.ecard-note{font-size:.76rem;color:var(--muted2);line-height:1.55;}
+.ecard-badge{display:inline-block;margin-top:11px;padding:3px 9px;border-radius:6px;font-size:.65rem;font-weight:700;}
+.badge-r{background:rgba(231,76,60,.1);color:var(--red);}
+.badge-g{background:rgba(46,204,113,.1);color:var(--green);}
+
+/* inflation block */
+.inflation-block{background:var(--s1);border:1px solid var(--brd2);border-radius:18px;overflow:hidden;margin-bottom:18px;}
+.inflation-header{background:var(--gold);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.inflation-header-title{font-family:'Libre Baskerville',serif;font-size:1.05rem;color:#080808;letter-spacing:-.3px;}
+.inflation-header-tag{font-size:.65rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(8,8,8,.65);}
+.inflation-body{padding:26px 22px;}
+.infl-grid{display:grid;grid-template-columns:280px 1fr;gap:32px;align-items:start;}
+@media(max-width:680px){.infl-grid{grid-template-columns:1fr;}}
+.ibs-label{font-size:.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted2);margin-bottom:8px;}
+.ibs-val{font-family:'Libre Baskerville',serif;font-size:4.5rem;line-height:1;color:var(--gold);margin-bottom:6px;}
+.ibs-sub{font-size:.8rem;color:var(--muted2);line-height:1.6;margin-bottom:20px;}
+.meter-wrap{margin-top:4px;}
+.meter-labels{display:flex;justify-content:space-between;font-size:.66rem;color:var(--muted2);margin-bottom:7px;}
+.meter-track{height:8px;border-radius:4px;background:linear-gradient(to right,#2ECC8A,#F5A623,#E8720C,#C02B2B);position:relative;}
+.meter-pin{position:absolute;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;background:var(--txt);border-radius:50%;border:3px solid #080808;box-shadow:0 0 0 2px var(--gold);transition:left 1s cubic-bezier(.34,1.56,.64,1);}
+.meter-footer{display:flex;justify-content:space-between;margin-top:7px;font-size:.63rem;color:var(--muted2);}
+.infl-callout{margin-top:20px;padding:14px 16px;background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.2);border-radius:12px;}
+.ic-label{font-size:.65rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.ic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;}
+.ic-val{font-family:'JetBrains Mono',monospace;font-size:1.3rem;color:var(--gold);font-weight:600;}
+.ic-sub{font-size:.68rem;color:var(--muted2);line-height:1.4;margin-top:2px;}
+.irp-title{font-size:.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted2);margin-bottom:12px;}
+.ir-table{width:100%;border-collapse:collapse;}
+.ir-table tr{border-bottom:1px solid var(--brd);}
+.ir-table tr:last-child{border-bottom:none;}
+.ir-table td{padding:8px 10px;font-size:.8rem;}
+.ir-yr{color:var(--muted2);font-weight:600;}
+.ir-val{font-family:'JetBrains Mono',monospace;font-weight:600;}
+.ir-high{color:var(--red);}.ir-med{color:var(--gold2);}.ir-low{color:var(--green);}
+.ir-bar-track{height:5px;background:var(--brd2);border-radius:3px;overflow:hidden;width:80px;}
+.ir-bar-fill{height:100%;border-radius:3px;}
+.ir-note{font-size:.7rem;color:var(--muted);margin-top:14px;line-height:1.6;}
+
+/* chart block */
+.chart-block{background:var(--s1);border:1px solid var(--brd2);border-radius:18px;padding:24px 22px;margin-bottom:18px;}
+.cb-title{font-family:'Libre Baskerville',serif;font-size:1.1rem;color:var(--txt);}
+.cb-sub{font-size:.76rem;color:var(--muted2);margin-top:3px;margin-bottom:18px;}
+.bar-row{display:flex;align-items:flex-end;gap:3px;height:130px;border-bottom:1px solid var(--brd2);overflow-x:auto;padding-bottom:0;margin-bottom:10px;}
+.bc{flex:1;min-width:22px;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end;}
+.bc-v{font-family:'JetBrains Mono',monospace;font-size:.45rem;color:var(--muted2);white-space:nowrap;}
+.bc-b{width:82%;border-radius:3px 3px 0 0;min-height:2px;cursor:crosshair;}
+.bc-b:hover{opacity:.72;}
+.bc-l{font-size:.5rem;color:var(--muted2);margin-top:4px;white-space:nowrap;}
+.legend{display:flex;gap:16px;flex-wrap:wrap;}
+.leg{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--muted2);}
+.leg-sq{width:10px;height:10px;border-radius:2px;}
+
+/* asset filter */
+.asset-filter{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.af{padding:6px 14px;border-radius:20px;border:1px solid var(--brd2);background:transparent;color:var(--muted2);font-family:'Sora',sans-serif;font-size:.74rem;font-weight:600;cursor:pointer;transition:all .18s;}
+.af.on{background:var(--gold);color:#080808;border-color:var(--gold);}
+.af:hover:not(.on){border-color:var(--muted2);color:var(--txt);}
+
+/* assets grid */
+.assets-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;}
+.ac{background:var(--s1);border:1px solid var(--brd2);border-radius:16px;padding:18px 16px;transition:transform .2s,box-shadow .2s;}
+.ac:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4);}
+.ac-top{display:flex;align-items:center;gap:9px;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--brd);}
+.ac-emoji{font-size:1.6rem;}
+.ac-name{font-weight:700;font-size:.84rem;color:var(--txt);line-height:1.25;}
+.ac-sub{font-size:.65rem;color:var(--muted2);margin-top:1px;}
+.pr-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.pr-lbl{font-size:.63rem;font-weight:600;color:var(--muted2);letter-spacing:.3px;}
+.pr-val{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:500;}
+.cv-past{color:var(--blue);}.cv-now{color:var(--gold);font-weight:700;}.cv-future{color:var(--green);}
+.pr-div{height:1px;background:var(--brd);margin:8px 0;}
+.qty-box{background:var(--s2);border:1px solid var(--brd2);border-radius:10px;padding:9px 11px;margin-top:8px;}
+.qty-head{font-size:.6rem;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--gold);margin-bottom:7px;}
+.qty-r{display:flex;justify-content:space-between;margin-bottom:3px;}
+.qty-lbl{font-size:.63rem;color:var(--muted2);}
+.qty-val{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:600;}
+
+/* table */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:.8rem;min-width:640px;}
+thead th{text-align:left;padding:10px 14px;background:var(--s2);color:var(--muted2);font-size:.67rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid var(--brd2);}
+tbody td{padding:11px 14px;border-bottom:1px solid var(--brd);vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:rgba(255,255,255,.018);}
+.tm{font-family:'JetBrains Mono',monospace;font-size:.77rem;}
+.rw-now td{background:rgba(232,160,32,.04);}
+.rw-fcast td{background:rgba(155,89,182,.04);}
+td.yr-now{color:var(--gold);font-weight:800;}
+td.yr-fcast{color:var(--purple);font-weight:700;}
+.t-up{color:var(--red);font-weight:700;}
+.t-dn{color:var(--green);font-weight:700;}
+
+/* timeline */
+.tl{padding-left:24px;position:relative;}
+.tl::before{content:'';position:absolute;left:6px;top:6px;bottom:6px;width:2px;background:var(--brd2);}
+.tl-item{position:relative;padding:0 0 24px 20px;}
+.tl-dot{position:absolute;left:-20px;top:5px;width:10px;height:10px;border-radius:50%;border:2px solid var(--bg);}
+.tl-item.past .tl-dot{background:var(--blue);box-shadow:0 0 0 2px var(--blue);}
+.tl-item.now .tl-dot{background:var(--gold);box-shadow:0 0 0 2px var(--gold);}
+.tl-item.future .tl-dot{background:var(--green);box-shadow:0 0 0 2px var(--green);}
+.tl-yr{font-size:.64rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted2);}
+.tl-amt{font-family:'JetBrains Mono',monospace;font-size:1.25rem;margin:3px 0;font-weight:600;}
+.tl-item.past .tl-amt{color:var(--blue);}
+.tl-item.now .tl-amt{color:var(--gold);}
+.tl-item.future .tl-amt{color:var(--green);}
+.tl-note{font-size:.77rem;color:var(--muted2);line-height:1.55;}
+
+/* fcast grid */
+.fcast-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;}
+.fc{background:var(--s1);border:1px solid var(--brd2);border-radius:16px;padding:18px 16px;}
+.fc-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.fc-ico{font-size:1.4rem;}
+.fc-name{font-weight:700;font-size:.84rem;}
+.fc-r{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.fc-lbl{font-size:.68rem;color:var(--muted2);}
+.fc-val{font-family:'JetBrains Mono',monospace;font-size:.79rem;font-weight:600;}
+.fc-div{height:1px;background:var(--brd);margin:8px 0;}
+.fc-qty{margin-top:10px;background:rgba(232,160,32,.06);border:1px solid rgba(232,160,32,.15);border-radius:10px;padding:9px 10px;}
+.fc-qty-h{font-size:.6rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.fc-qty-r{display:flex;justify-content:space-between;margin-bottom:3px;}
+.fc-qty-l{font-size:.65rem;color:var(--muted2);}
+.fc-qty-v{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;}
+
+/* beat block */
+.beat-block{background:var(--s1);border:1px solid var(--brd2);border-radius:18px;overflow:hidden;margin-bottom:18px;}
+.beat-header{background:var(--s2);border-bottom:1px solid var(--brd2);color:var(--txt);padding:16px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.beat-header h3{font-family:'Libre Baskerville',serif;font-size:1.2rem;letter-spacing:-.3px;color:var(--txt);}
+.beat-header p{font-size:.76rem;color:var(--muted2);margin-top:2px;}
+.beat-avg-rate{font-family:'JetBrains Mono',monospace;font-size:1.5rem;color:var(--gold);line-height:1;font-weight:600;}
+.beat-avg-label{font-size:.62rem;color:var(--muted2);margin-top:2px;}
+.beat-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;padding:14px;}
+.bc2{background:var(--s2);border:1px solid var(--brd2);border-radius:14px;padding:18px 18px;}
+.bc2-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.bc2-icon{width:36px;height:36px;border:1px solid var(--brd2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;background:var(--s3);}
+.bc2-title{font-weight:700;font-size:.86rem;color:var(--txt);margin-bottom:3px;}
+.bc2-return{display:inline-block;font-size:.62rem;font-weight:700;background:rgba(46,204,113,.1);color:var(--green);border-radius:6px;padding:2px 7px;}
+.bc2-desc{font-size:.76rem;color:var(--muted2);line-height:1.65;}
+
+.block{background:var(--s1);border:1px solid var(--brd2);border-radius:18px;padding:24px 22px;margin-bottom:18px;}
+.block-h{font-family:'Libre Baskerville',serif;font-size:1.1rem;color:var(--txt);margin-bottom:4px;}
+.block-sub{font-size:.78rem;color:var(--muted2);margin-bottom:18px;}
+
+/* spinner */
+.sp-ov{display:none;position:fixed;inset:0;background:rgba(8,8,8,.9);z-index:500;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
+.sp-ov.show{display:flex;}
+.sp{width:42px;height:42px;border:2px solid var(--brd2);border-top-color:var(--gold);border-radius:50%;animation:spin .65s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.sp-t{font-family:'Libre Baskerville',serif;font-size:1rem;color:var(--muted2);}
+
+/* tooltip */
+#tt{position:fixed;pointer-events:none;z-index:600;background:var(--s2);color:var(--txt);border:1px solid var(--brd2);border-radius:10px;padding:10px 14px;font-size:.76rem;display:none;min-width:130px;box-shadow:0 8px 24px rgba(0,0,0,.5);}
+#tt-yr{font-weight:700;color:var(--gold);margin-bottom:4px;font-size:.8rem;}
+.tt-r{display:flex;justify-content:space-between;gap:12px;margin-bottom:2px;}
+.tt-l{color:var(--muted2);}
+.tt-v{font-family:'JetBrains Mono',monospace;font-weight:700;}
+
+footer{background:var(--s1);border-top:1px solid var(--brd);text-align:center;padding:28px;color:var(--muted);font-size:.76rem;line-height:1.95;margin-top:40px;}
+footer strong{color:var(--gold);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .4s ease forwards;}
+.results-section{display:none;}
+.results-section.show{display:block;}
+@media(max-width:640px){.nav-date{display:none;}.masthead{padding:44px 1rem 40px;}.calc-wrap{padding:0 1rem;}.page{padding:0 1rem 60px;}}
+/* fix bar-chart since --ink3 no longer is dark */
+.bc-b[style*="navy"]{background:var(--blue) !important;}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+<div id="tt"><div id="tt-yr"></div><div id="tt-body"></div></div>
+<div class="sp-ov" id="spinner"><div class="sp"></div><div class="sp-t">Calculating…</div></div>
+
+<nav class="nav">
+  <div class="nav-brand">
+    <div class="nav-rupee">₹</div>
+    <div class="nav-name">Rupee Value</div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-live"><div class="live-dot"></div>Live Data</div>
+    <div class="nav-date">✓ Verified — March 2026</div>
+  </div>
+</nav>
+
+<div class="masthead">
+  <div class="masthead-inner">
+    <div class="masthead-kicker">India's Money Power Calculator</div>
+    <h1>What is your<br><em>₹ really worth?</em></h1>
+    <p class="masthead-sub">Enter any amount. See its real purchasing power in the past, what it buys today in gold, land and dollars — and how much you'll need in the future.</p>
+    <div class="ticker-strip">
+      <div class="ticker-item"><span class="tick-label">Gold 22K</span>&nbsp;<span class="tick-val">₹15,000/g</span>&nbsp;<span class="tick-change tc-up">↑ Mar 8</span></div>
+      <div class="ticker-item"><span class="tick-label">Gold 24K</span>&nbsp;<span class="tick-val">₹16,364/g</span>&nbsp;<span class="tick-change tc-up">↑ Mar 8</span></div>
+      <div class="ticker-item"><span class="tick-label">Land / Cent</span>&nbsp;<span class="tick-val">₹19.86L avg</span>&nbsp;<span class="tick-change tc-up">↑ 2026</span></div>
+      <div class="ticker-item"><span class="tick-label">USD / INR</span>&nbsp;<span class="tick-val">₹91.93</span>&nbsp;<span class="tick-change tc-up">↑ Mar 8</span></div>
+      <div class="ticker-item"><span class="tick-label">CPI 2025</span>&nbsp;<span class="tick-val">2.8%</span>&nbsp;<span class="tick-change tc-dn">↓ IMF</span></div>
+    </div>
+    <div class="asset-chips">
+      <div class="achip"><div class="achip-dot" style="background:var(--gold)"></div>Gold 22K &amp; 24K</div>
+      <div class="achip"><div class="achip-dot" style="background:var(--green)"></div>Land per Cent (435.6 sqft)</div>
+      <div class="achip"><div class="achip-dot" style="background:var(--blue)"></div>USD / INR Rate</div>
+      <div class="achip"><div class="achip-dot" style="background:var(--purple)"></div>10-Year Forecast</div>
+      <div class="achip"><div class="achip-dot" style="background:var(--red)"></div>Inflation Spotlight</div>
+    </div>
+  </div>
+</div>
+
+<div class="calc-wrap">
+  <div class="calc-card">
+    <div class="calc-card-top">
+      <div class="calc-card-title">
+        <h2>Purchasing Power Calculator</h2>
+        <p>Base year: 2026 (today). Compare any past year (1950–2025) and project any future year (2027–2076).</p>
+      </div>
+      <div class="base-tag">⏱ Base: 2026</div>
+    </div>
+    <div class="calc-card-body">
+      <div class="hint">📌 Enter your amount in <strong>today's rupees (2026)</strong>. We show what that money was equivalent to in your chosen past year, and how much you'll need in the future — using verified IMF + RBI inflation data.</div>
+      <div class="fields">
+        <div class="fg">
+          <label>Your Amount (₹)</label>
+          <div class="fi-wrap"><span class="fi-pre">₹</span><input type="number" id="amount" value="50000" min="1" placeholder="50000"></div>
+        </div>
+        <div class="fg">
+          <label>Past Year</label>
+          <div class="fi-wrap"><select id="pastYear"></select></div>
+        </div>
+        <div class="fg">
+          <label>Future Year</label>
+          <div class="fi-wrap"><select id="futureYear"></select></div>
+        </div>
+      </div>
+      <button class="go-btn" onclick="calculate()"><span>→ Show My Rupee's Real Purchasing Power</span></button>
+    </div>
+  </div>
+</div>
+
+<div class="results-section" id="results">
+<div class="page">
+
+  <div class="src-bar">
+    <span class="src-icon">🔍</span>
+    <span><strong>Verified March 8, 2026 —</strong> Gold 22K ₹15,000/g · 24K ₹16,364/g (GoodReturns) · <strong>1 cent = 435.6 sqft · avg ₹4,560/sqft → ₹19,86,336/cent</strong> (NHB RESIDEX + PropEquity 2026) · USD/INR ₹91.93 (Investing.com) · CPI: IMF/RBI 1950–2025 · Forecast: Holt's ETS + 20yr CAGR blend</span>
+  </div>
+
+  <div class="sh">
+    <div><div class="sh-kicker">Purchasing Power</div><h2 id="r-title">Your Money Across Time</h2><p id="r-sub"></p></div>
+  </div>
+  <div class="era-grid">
+    <div class="ecard past fu">
+      <div class="ecard-era">📅 Past Equivalent</div>
+      <div class="ecard-yr" id="e-past-yr"></div>
+      <div class="ecard-val" id="e-past-val"></div>
+      <div class="ecard-note" id="e-past-note"></div>
+    </div>
+    <div class="ecard now fu">
+      <div class="ecard-era">📍 Today — 2026</div>
+      <div class="ecard-yr">Your entered amount</div>
+      <div class="ecard-val" id="e-now-val"></div>
+      <div class="ecard-note" id="e-now-note"></div>
+      <span class="ecard-badge badge-r" id="e-now-badge"></span>
+    </div>
+    <div class="ecard future fu">
+      <div class="ecard-era">🔮 Future Projection</div>
+      <div class="ecard-yr" id="e-fut-yr"></div>
+      <div class="ecard-val" id="e-fut-val"></div>
+      <div class="ecard-note" id="e-fut-note"></div>
+      <span class="ecard-badge badge-g" id="e-fut-badge"></span>
+    </div>
+  </div>
+
+  <div class="sh" style="margin-top:44px">
+    <div><div class="sh-kicker">Inflation Spotlight</div><h2>The Silent Wealth Destroyer</h2><p>India's inflation history — the rates that eroded your purchasing power</p></div>
+    <div class="sh-tag">IMF + RBI Verified</div>
+  </div>
+  <div class="inflation-block">
+    <div class="inflation-header">
+      <div>
+        <div class="inflation-header-title">🔥 Inflation Rate — Your Selected Period</div>
+        <div class="inflation-header-tag">Historical Average · IMF / RBI CPI Data · 1950–2026</div>
+      </div>
+      <div style="font-size:.72rem;color:var(--ink);opacity:.7;text-align:right">Even 5% p.a. halves your money's real value<br>in just 14 years. 10% p.a. does it in 7 years.</div>
+    </div>
+    <div class="inflation-body">
+      <div class="infl-grid">
+        <div>
+          <div class="ibs-label">Avg inflation — your period</div>
+          <div class="ibs-val" id="spot-rate">—</div>
+          <div class="ibs-sub" id="spot-context">Calculate to see your personalised inflation analysis.</div>
+          <div class="meter-wrap">
+            <div class="meter-labels"><span>0% Deflation</span><span id="meter-mid" style="color:var(--saffron2);font-weight:700"></span><span>20%+ High</span></div>
+            <div class="meter-track"><div class="meter-pin" id="needle"></div></div>
+            <div class="meter-footer"><span>🟢 Healthy &lt;4%</span><span>🟡 RBI Target 4–6%</span><span>🔴 High &gt;8%</span></div>
+          </div>
+          <div class="infl-callout" id="calloutEl" style="display:none">
+            <div class="ic-label">Real impact on ₹<span id="callout-amt"></span></div>
+            <div class="ic-grid" id="callout-grid"></div>
+          </div>
+        </div>
+        <div>
+          <div class="irp-title">Key CPI Rates — Your Period</div>
+          <table class="ir-table" id="irTable"><tr><td colspan="4" style="color:rgba(245,240,232,.3);font-size:.75rem;padding:8px 10px">Calculate to see inflation rates for your selected years.</td></tr></table>
+          <div class="ir-note" id="ir-note"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-block fu">
+    <div class="cb-title">Purchasing Power Erosion Chart</div>
+    <div class="cb-sub">Equivalent value of ₹<span id="chart-lbl"></span> across years — past to future</div>
+    <div class="bar-row" id="barChart"></div>
+    <div class="legend">
+      <div class="leg"><div class="leg-sq" style="background:#3498DB"></div>Past</div>
+      <div class="leg"><div class="leg-sq" style="background:#E8A020"></div>Today 2026</div>
+      <div class="leg"><div class="leg-sq" style="background:#2ECC71"></div>Future</div>
+    </div>
+  </div>
+
+  <div class="sh">
+    <div><div class="sh-kicker">Asset Buying Power</div><h2>What Can ₹<span id="asset-lbl"></span> Buy?</h2><p>Verified prices — what your entered amount buys in each era. Land shown per cent (435.6 sqft).</p></div>
+    <div class="sh-tag">1 cent = 435.6 sqft</div>
+  </div>
+  <div style="margin-bottom:12px">
+    <div class="asset-filter" id="assetFilter"></div>
+    <div class="assets-grid" id="assetsGrid"></div>
+  </div>
+
+  <div class="sh">
+    <div><div class="sh-kicker">Full Historical Record</div><h2>Price Data 2005 → 2036</h2><p>Verified historical (2005–2026) and 10-year forecast (2027–2036) with YoY % changes</p></div>
+  </div>
+  <div class="block" style="padding:0"><div class="tbl-wrap"><table id="dataTable"></table></div></div>
+
+  <div class="sh">
+    <div><div class="sh-kicker">Money's Journey</div><h2>₹<span id="tl-lbl"></span> Through Time</h2></div>
+  </div>
+  <div class="block"><div class="tl" id="tlEl"></div></div>
+
+  <div class="sh">
+    <div><div class="sh-kicker">10-Year Forecast</div><h2>What Will ₹<span id="fc-lbl"></span> Buy in <span id="fc-yr">—</span>?</h2><p>Holt's Double Exponential Smoothing + 20-year CAGR blend · IMF India 4.5% p.a. baseline</p></div>
+  </div>
+  <div class="fcast-grid" id="fcastGrid"></div>
+
+  <div class="sh" style="margin-top:44px">
+    <div><div class="sh-kicker">Smart Money Moves</div><h2>How to Beat Inflation in India</h2><p>Proven strategies to protect and grow your purchasing power</p></div>
+  </div>
+  <div class="beat-block">
+    <div class="beat-header">
+      <div><h3>Your Personalised Action Plan</h3><p id="beat-sub">Based on your entered amount and selected time horizon</p></div>
+      <div style="text-align:right"><div class="beat-avg-rate" id="beat-rate">—</div><div class="beat-avg-label">avg inflation rate</div></div>
+    </div>
+    <div class="beat-cards" id="beatCards"></div>
+  </div>
+
+</div>
+</div>
+
+<footer>
+  <strong>Rupee Value</strong> — India Purchasing Power &amp; Asset Price Intelligence<br>
+ <span style="align-items: center;"> <span style="font-size: 20px;vertical-align: -3px;"> &copy; </span>2026 All Rights Reserved.</span>
+ <br>Designed & Developed by  <strong> Dhanush Prabhu K .</strong> 
+ <br> <a href="https://www.linkedin.com/in/k-dhanush-prabhu-518368201" target="_blank" style="text-decoration: none; color: white;"> <i style="font-size:16px;color: white;" class="fa">&#xf0e1;</i> - Let's Connect </a>
+</footer>
+
+<script>
+const SQFT_PER_CENT=435.6,CY=2026,FUT_INF=4.5;
+const INF={1950:4.5,1951:15.0,1952:-3.0,1953:-1.5,1954:-2.5,1955:-1.0,1956:8.0,1957:6.0,1958:3.5,1959:4.0,1960:1.7,1961:1.5,1962:3.5,1963:8.0,1964:12.5,1965:10.0,1966:13.5,1967:13.0,1968:2.5,1969:3.0,1970:5.5,1971:3.0,1972:6.5,1973:16.5,1974:28.6,1975:6.0,1976:-7.6,1977:9.0,1978:2.5,1979:6.0,1980:11.4,1981:13.0,1982:7.9,1983:11.9,1984:8.3,1985:5.6,1986:8.7,1987:8.8,1988:9.4,1989:3.4,1990:9.0,1991:13.9,1992:11.8,1993:6.4,1994:10.2,1995:10.2,1996:9.0,1997:7.2,1998:13.2,1999:4.7,2000:4.0,2001:3.7,2002:4.4,2003:3.8,2004:3.8,2005:4.2,2006:6.1,2007:6.4,2008:8.3,2009:10.9,2010:12.0,2011:8.9,2012:9.3,2013:10.9,2014:6.4,2015:4.9,2016:4.5,2017:3.6,2018:3.9,2019:3.7,2020:6.2,2021:5.1,2022:6.7,2023:5.4,2024:4.85,2025:2.8};
+const G24={2005:700,2006:840,2007:942.8,2008:1236.1,2009:1541.7,2010:1844.8,2011:2413,2012:2992.6,2013:2884.8,2014:2770.8,2015:2667.1,2016:3012.8,2017:2917.4,2018:3069.2,2019:3515.4,2020:4756.2,2021:4743.7,2022:5124.9,2023:5883.6,2024:7537.3,2025:11000,2026:16364};
+const G22={};Object.keys(G24).forEach(y=>{G22[y]=+(G24[y]*(22/24)).toFixed(1);});G22[2026]=15000;
+const USD={2005:44.10,2006:45.31,2007:41.35,2008:43.51,2009:48.41,2010:45.74,2011:46.67,2012:53.44,2013:58.60,2014:61.03,2015:64.15,2016:67.20,2017:65.12,2018:68.39,2019:70.39,2020:74.18,2021:73.92,2022:78.60,2023:82.60,2024:83.90,2025:87.16,2026:91.93};
+// Land per CENT (435.6 sqft) — NHB RESIDEX 10-city avg ₹/sqft × 435.6
+// 2024 base: PropEquity residential plots avg ₹3,679/sqft; 2025 +11% NHB HPI; 2026 +7% extrapolated
+const LAND_CENT={};
+const LSQFT={2005:560,2006:640,2007:780,2008:860,2009:820,2010:1000,2011:1160,2012:1320,2013:1460,2014:1540,2015:1580,2016:1620,2017:1660,2018:1700,2019:1760,2020:1740,2021:1800,2022:1940,2023:2100,2024:3679,2025:4085,2026:4560};
+Object.keys(LSQFT).forEach(y=>{LAND_CENT[y]=Math.round(LSQFT[y]*SQFT_PER_CENT);});
+const HY=Object.keys(G24).map(Number).sort((a,b)=>a-b);
+function holts(v,a=0.3,b=0.1,h=10){let L=v[0],T=v[1]-v[0];const fit=[L];for(let i=1;i<v.length;i++){const lp=L,tp=T;L=a*v[i]+(1-a)*(lp+tp);T=b*(L-lp)+(1-b)*tp;fit.push(L+T);}const res=v.map((x,i)=>x-fit[i]);const std=Math.sqrt(res.reduce((s,r)=>s+r*r,0)/res.length);const fc=[],lo=[],hi=[];for(let i=1;i<=h;i++){const x=L+i*T;fc.push(x);lo.push(x-std*1.5*Math.sqrt(i));hi.push(x+std*1.5*Math.sqrt(i));}return{fc,lo,hi};}
+function bFC(obj,h=10,a=0.3,b=0.1){const ys=Object.keys(obj).map(Number).sort((x,y)=>x-y);const vs=ys.map(y=>obj[y]);const n=vs.length;const ht=holts(vs,a,b,h);const hC=Math.pow(vs[n-1]/vs[0],1/(n-1))-1;const last=vs[n-1];const out=[];for(let i=0;i<h;i++){const hv=ht.fc[i],cv=last*Math.pow(1+hC,i+1);out.push(Math.max(0.6*hv+0.4*cv,last*0.05));}return{values:out,cagr:hC};}
+const FC_G22=bFC(G22),FC_G24=bFC(G24),FC_USD=bFC(USD,10,0.4,0.15),FC_LAND=bFC(LAND_CENT);
+const FC0=2027,AY=[...HY,...Array.from({length:10},(_,i)=>FC0+i)];
+function av(id,y){const s=id==='g22'?G22:id==='g24'?G24:id==='usd'?USD:LAND_CENT;const f=id==='g22'?FC_G22:id==='g24'?FC_G24:id==='usd'?FC_USD:FC_LAND;if(y<=CY)return s[y]||null;const i=y-FC0;return(i>=0&&i<f.values.length)?f.values[i]:null;}
+function cpiM(f,t){if(f===t)return 1;let m=1;const lo=Math.min(f,t),hi=Math.max(f,t);for(let y=lo;y<hi;y++)m*=(1+((y<=2025?INF[y]:FUT_INF)||5)/100);return f<t?m:1/m;}
+function avgInf(f,t){const lo=Math.min(f,t),hi=Math.max(f,t);let s=0,c=0;for(let y=lo;y<hi;y++){s+=((y<=2025?INF[y]:FUT_INF)||5);c++;}return c?s/c:FUT_INF;}
+function fR(n){if(!n&&n!==0)return'—';const a=Math.abs(n);if(a>=1e7)return'₹'+(n/1e7).toFixed(2)+' Cr';if(a>=1e5)return'₹'+(n/1e5).toFixed(2)+' L';if(a>=1000)return'₹'+(n/1000).toFixed(1)+'K';if(a<10)return'₹'+n.toFixed(2);return'₹'+Math.round(n).toLocaleString('en-IN');}
+function fFull(n){return'₹'+Math.round(n).toLocaleString('en-IN');}
+function fUSD(n){return n?'₹'+n.toFixed(2):'—';}
+function qty(a,p){if(!p||p<=0)return'N/A';const q=a/p;if(q>=1)return q.toFixed(q>=100?0:q>=10?1:2)+' units';return(q*100).toFixed(2)+'% of 1';}
+const pSel=document.getElementById('pastYear'),fSel=document.getElementById('futureYear');
+for(let y=2025;y>=1950;y--){const o=document.createElement('option');o.value=y;o.textContent=y;if(y===2005)o.selected=true;pSel.appendChild(o);}
+for(let y=2027;y<=2076;y++){const o=document.createElement('option');o.value=y;o.textContent=y;if(y===2036)o.selected=true;fSel.appendChild(o);}
+const ITEMS=[
+  {n:'Gold 22K',s:'per 1 gram',e:'🥇',cat:'gold',p:y=>av('g22',y)},
+  {n:'Gold 22K',s:'8 grams (1 set)',e:'🏅',cat:'gold',p:y=>av('g22',y)?av('g22',y)*8:null},
+  {n:'Gold 24K',s:'per 1 gram',e:'✨',cat:'gold',p:y=>av('g24',y)},
+  {n:'Gold 24K',s:'8 grams',e:'🎖️',cat:'gold',p:y=>av('g24',y)?av('g24',y)*8:null},
+  {n:'Land',s:'1 cent (435.6 sqft)',e:'🏡',cat:'land',p:y=>av('land',y)},
+  {n:'Land',s:'5 cents (2,178 sqft)',e:'🏘️',cat:'land',p:y=>av('land',y)?av('land',y)*5:null},
+  {n:'1 US Dollar',s:'₹ to buy $1',e:'💵',cat:'forex',p:y=>av('usd',y)},
+  {n:'100 US Dollars',s:'₹ to buy $100',e:'💰',cat:'forex',p:y=>av('usd',y)?av('usd',y)*100:null},
+];
+const CATS=[{k:'all',l:'All'},{k:'gold',l:'🥇 Gold'},{k:'land',l:'🏡 Land (per Cent)'},{k:'forex',l:'💵 USD/INR'}];
+let ACT='all',_amt=0,_past=2005,_fut=2036;
+
+function calculate(){
+  const amount=parseFloat(document.getElementById('amount').value);
+  const past=parseInt(document.getElementById('pastYear').value);
+  const future=parseInt(document.getElementById('futureYear').value);
+  if(!amount||amount<=0){alert('Please enter a valid amount!');return;}
+  document.getElementById('spinner').classList.add('show');
+  setTimeout(()=>{
+    _amt=amount;_past=past;_fut=future;
+    const pEq=amount/cpiM(past,CY),fNeed=amount*cpiM(CY,future),avgP=avgInf(past,CY);
+    const rise=((amount-pEq)/pEq*100).toFixed(1),futPct=((fNeed/amount-1)*100).toFixed(0);
+    document.getElementById('r-title').textContent='₹'+amount.toLocaleString('en-IN')+' — Purchasing Power Report';
+    document.getElementById('r-sub').textContent=past+' → 2026 → '+future+' · Avg inflation '+past+'–2026: '+avgP.toFixed(1)+'% p.a. · IMF future: '+FUT_INF+'% p.a.';
+    document.getElementById('e-past-yr').textContent='In '+past+', today\'s ₹'+amount.toLocaleString('en-IN')+' was equivalent to:';
+    document.getElementById('e-past-val').textContent=fFull(pEq);
+    document.getElementById('e-past-note').textContent='Prices rose +'+rise+'% from '+past+' to 2026. What costs ₹'+amount.toLocaleString('en-IN')+' today cost only '+fFull(pEq)+' back then.';
+    document.getElementById('e-now-val').textContent=fFull(amount);
+    document.getElementById('e-now-note').textContent='Your 2026 baseline. Cumulative inflation since '+past+' eroded '+rise+'% of purchasing power.';
+    document.getElementById('e-now-badge').textContent='+'+rise+'% price rise since '+past;
+    document.getElementById('e-fut-yr').textContent='In '+future+', you\'ll need this much to match today:';
+    document.getElementById('e-fut-val').textContent=fFull(fNeed);
+    document.getElementById('e-fut-note').textContent='At projected '+FUT_INF+'% p.a., you\'ll need '+fFull(fNeed)+' in '+future+' to match today\'s buying power.';
+    document.getElementById('e-fut-badge').textContent='+'+futPct+'% more needed by '+future;
+    document.getElementById('spot-rate').textContent=avgP.toFixed(1)+'%';
+    document.getElementById('meter-mid').textContent=avgP.toFixed(1)+'% p.a.';
+    document.getElementById('needle').style.left=Math.min(Math.max((avgP/20)*100,2),98)+'%';
+    document.getElementById('spot-context').textContent='Average annual CPI inflation between '+past+' and 2026. At this rate, ₹1 lakh becomes worth only ₹'+Math.round(100000/Math.pow(1+avgP/100,10)).toLocaleString('en-IN')+' in real terms after 10 years.';
+    const lo2=Math.min(past,2025),hi2=Math.min(CY-1,2025),sp2=hi2-lo2>20?5:hi2-lo2>10?2:1;
+    const sYrs=[];for(let y=lo2;y<=hi2;y+=sp2)if(INF[y]!==undefined)sYrs.push(y);
+    if(!sYrs.includes(2025)&&INF[2025])sYrs.push(2025);
+    const disp=sYrs.slice(-8);
+    const mxIR=Math.max(...disp.map(y=>Math.abs(INF[y])));
+    document.getElementById('irTable').innerHTML=disp.map(y=>{const r=INF[y];const cls=r>=8?'ir-high':r>=4?'ir-med':'ir-low';const bw=Math.round((Math.abs(r)/mxIR)*100);const bc=r>=8?'#FF7C7C':r>=4?'#F59338':'#5CC98A';return'<tr><td class="ir-yr">'+y+'</td><td class="ir-val '+cls+'">'+(r>0?'+':'')+r.toFixed(1)+'%</td><td><div class="ir-bar-track"><div class="ir-bar-fill" style="width:'+bw+'%;background:'+bc+'"></div></div></td><td style="font-size:.68rem;color:rgba(245,240,232,.4)">'+(r>=10?'Crisis':r>=6?'High':r>=4?'Moderate':r>=0?'Low':'Deflation')+'</td></tr>';}).join('');
+    document.getElementById('ir-note').textContent='Notable peaks: 1974 (28.6%), 1991 (13.9%), 2010 (12.0%), 2013 (10.9%). 2025: 2.8% (RBI target: 4% ±2%).';
+    document.getElementById('callout-amt').textContent=amount.toLocaleString('en-IN');
+    document.getElementById('calloutEl').style.display='block';
+    document.getElementById('callout-grid').innerHTML=['<div class="ic-item"><div class="ic-val">'+fR(Math.round(amount/Math.pow(1+avgP/100,5)))+'</div><div class="ic-sub">Real value in 5 years at '+avgP.toFixed(0)+'% avg</div></div>','<div class="ic-item"><div class="ic-val">'+fR(Math.round(amount/Math.pow(1+avgP/100,10)))+'</div><div class="ic-sub">Real value in 10 years</div></div>','<div class="ic-item"><div class="ic-val">'+fR(Math.round(amount/Math.pow(1+avgP/100,20)))+'</div><div class="ic-sub">Real value in 20 years</div></div>','<div class="ic-item"><div class="ic-val">'+Math.round(100000/Math.pow(1+avgP/100,10)/1000)+'K</div><div class="ic-sub">Real value of ₹1L in 10yr</div></div>'].join('');
+    document.getElementById('chart-lbl').textContent=amount.toLocaleString('en-IN');
+    buildChart(amount,past,future);
+    ['asset-lbl','tl-lbl','fc-lbl'].forEach(id=>{document.getElementById(id).textContent=amount.toLocaleString('en-IN');});
+    document.getElementById('fc-yr').textContent=future;
+    buildFilter();buildAssets();buildTable();buildTimeline(amount,past,future,pEq,fNeed);buildFcast(amount,future);buildBeat(avgP,amount,future);
+    document.getElementById('results').classList.add('show');
+    document.getElementById('spinner').classList.remove('show');
+    setTimeout(()=>document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'}),80);
+  },900);
+}
+
+function buildChart(amt,past,future){
+  const el=document.getElementById('barChart');el.innerHTML='';
+  const yrs=[];const sp=CY-past,st=sp<=10?2:sp<=30?5:10;
+  for(let y=past;y<=CY;y+=st)if(!yrs.includes(y))yrs.push(y);
+  if(!yrs.includes(CY))yrs.push(CY);
+  const fs=future-CY,fst=fs<=10?2:fs<=30?5:10;
+  for(let y=CY+fst;y<=future;y+=fst)if(!yrs.includes(y))yrs.push(y);
+  if(!yrs.includes(future))yrs.push(future);
+  const vals=yrs.map(y=>y<=CY?amt/cpiM(y,CY):amt*cpiM(CY,y));
+  const mx=Math.max(...vals);
+  yrs.forEach((yr,i)=>{
+    const v=vals[i],h=Math.max((v/mx)*122,2);
+    const clr=yr<CY?'#3498DB':yr===CY?'#E8A020':'#2ECC71';
+    const c=document.createElement('div');c.className='bc';
+    c.innerHTML='<div class="bc-v">'+fR(v)+'</div><div class="bc-b" style="height:'+h+'px;background:'+clr+'" onmouseenter="showTT(event,'+yr+',\''+fFull(v)+'\')" onmouseleave="hideTT()"></div><div class="bc-l">'+yr+'</div>';
+    el.appendChild(c);
+  });
+}
+function showTT(e,yr,val){const t=document.getElementById('tt');document.getElementById('tt-yr').textContent=yr+(yr>CY?' 🔮':' ✓');document.getElementById('tt-body').innerHTML='<div class="tt-r"><span class="tt-l">Equiv.</span><span class="tt-v" style="color:var(--saffron2)">'+val+'</span></div>';t.style.display='block';t.style.left=(e.clientX+14)+'px';t.style.top=(e.clientY-44)+'px';}
+function hideTT(){document.getElementById('tt').style.display='none';}
+
+function buildFilter(){
+  const el=document.getElementById('assetFilter');el.innerHTML='';
+  CATS.forEach(c=>{const b=document.createElement('button');b.className='af'+(c.k===ACT?' on':'');b.textContent=c.l;b.onclick=()=>{ACT=c.k;document.querySelectorAll('.af').forEach(x=>x.classList.remove('on'));b.classList.add('on');buildAssets();};el.appendChild(b);});
+}
+function buildAssets(){
+  const el=document.getElementById('assetsGrid');el.innerHTML='';
+  ITEMS.filter(it=>ACT==='all'||it.cat===ACT).forEach(it=>{
+    const pP=it.p(_past),pN=it.p(CY),pF=it.p(_fut);
+    const iU=it.cat==='forex';const sf=p=>!p?'—':iU?fUSD(p):fR(p);
+    const d=document.createElement('div');d.className='ac';
+    d.innerHTML='<div class="ac-top"><span class="ac-emoji">'+it.e+'</span><div><div class="ac-name">'+it.n+'</div><div class="ac-sub">'+it.s+'</div></div></div>'
+      +'<div class="pr-row"><span class="pr-lbl">📅 '+_past+'</span><span class="pr-val cv-past">'+sf(pP)+'</span></div>'
+      +'<div class="pr-row"><span class="pr-lbl">📍 2026 ✓</span><span class="pr-val cv-now">'+sf(pN)+'</span></div>'
+      +'<div class="pr-row"><span class="pr-lbl">🔮 '+_fut+'</span><span class="pr-val cv-future">'+sf(pF)+'</span></div>'
+      +'<div class="pr-div"></div>'
+      +'<div class="qty-box"><div class="qty-head">₹'+_amt.toLocaleString('en-IN')+' buys</div>'
+      +'<div class="qty-r"><span class="qty-lbl">In '+_past+'</span><span class="qty-val cv-past">'+(pP?qty(_amt,pP):'—')+'</span></div>'
+      +'<div class="qty-r"><span class="qty-lbl">Today</span><span class="qty-val cv-now">'+(pN?qty(_amt,pN):'—')+'</span></div>'
+      +'<div class="qty-r"><span class="qty-lbl">In '+_fut+'</span><span class="qty-val cv-future">'+(pF?qty(_amt,pF):'—')+'</span></div></div>';
+    el.appendChild(d);
+  });
+}
+
+function buildTable(){
+  const el=document.getElementById('dataTable');
+  el.innerHTML='<thead><tr><th>Year</th><th>🥇 Gold 22K/g</th><th>22K×8g</th><th>✨ Gold 24K/g</th><th>🏡 Land/Cent</th><th>Land ₹/sqft</th><th>💵 USD/INR</th><th>Gold YoY%</th><th>Land YoY%</th><th>USD YoY%</th></tr></thead>';
+  const tb=document.createElement('tbody');
+  AY.forEach((y,idx)=>{
+    const isF=y>CY,isN=y===CY;
+    const g22=av('g22',y),g24=av('g24',y),land=av('land',y),usd=av('usd',y);
+    const prev=AY[idx-1];
+    const p=(a,id)=>{if(!prev)return'—';const pv=av(id,prev);return pv?((a-pv)/pv*100).toFixed(1):'—';};
+    const pC=v=>{if(v==='—')return'<td class="tm" style="color:var(--fog)">—</td>';const n=parseFloat(v);return'<td class="'+(n>0?'t-up':'t-dn')+' tm">'+(n>0?'▲':'▼')+Math.abs(n)+'%</td>';};
+    const tr=document.createElement('tr');
+    if(isN)tr.className='rw-now';else if(isF)tr.className='rw-fcast';
+    const fc=isF?'color:var(--navy2)':'';
+    tr.innerHTML='<td class="'+(isN?'yr-now':isF?'yr-fcast':'')+'" style="font-weight:700">'+y+(isN?' 📍':isF?' 🔮':'')+'</td>'
+      +'<td class="tm" style="'+(fc||'color:var(--saffron)')+'">'+(g22?fR(g22):'—')+'</td>'
+      +'<td class="tm" style="'+(fc||'color:var(--saffron)')+'">'+(g22?fR(g22*8):'—')+'</td>'
+      +'<td class="tm" style="'+(fc||'color:#9B7428')+'">'+(g24?fR(g24):'—')+'</td>'
+      +'<td class="tm" style="font-weight:700;'+(fc||'color:var(--teal)')+'">'+(land?fR(land):'—')+'</td>'
+      +'<td class="tm" style="'+(fc||'color:var(--teal)')+'">'+(land?'₹'+Math.round(land/SQFT_PER_CENT).toLocaleString('en-IN'):'—')+'</td>'
+      +'<td class="tm" style="'+(fc||'color:var(--navy)')+'">'+(usd?fUSD(usd):'—')+'</td>'
+      +pC(p(g22,'g22'))+pC(p(land,'land'))+pC(p(usd,'usd'));
+    tb.appendChild(tr);
+  });
+  el.appendChild(tb);
+}
+
+function buildTimeline(amt,past,future,pEq,fNeed){
+  const mid=Math.round((past+CY)/2),midV=amt/cpiM(mid,CY);
+  const fmid=Math.round((CY+future)/2),fmidV=amt*cpiM(CY,fmid);
+  const steps=[
+    {cls:'past',yr:past,val:pEq,note:'In '+past+', today\'s ₹'+amt.toLocaleString('en-IN')+' was worth only '+fFull(pEq)+'. Prices were far lower.'},
+    {cls:'past',yr:mid,val:midV,note:'Midpoint '+mid+' — cumulative inflation already significantly reduced real value.'},
+    {cls:'now',yr:CY,val:amt,note:'Today (2026) — your entered amount. The real 2026 benchmark.'},
+    {cls:'future',yr:fmid,val:fmidV,note:'In '+fmid+', you\'d need '+fFull(fmidV)+' to match today\'s purchasing power at '+FUT_INF+'% p.a.'},
+    {cls:'future',yr:future,val:fNeed,note:'In '+future+', you\'ll need '+fFull(fNeed)+' to equal ₹'+amt.toLocaleString('en-IN')+' today. Start investing now.'},
+  ];
+  document.getElementById('tlEl').innerHTML=steps.map(s=>'<div class="tl-item '+s.cls+'"><div class="tl-dot"></div><div class="tl-yr">'+(s.yr===CY?'TODAY — 2026':s.yr)+'</div><div class="tl-amt">'+fFull(Math.round(s.val))+'</div><div class="tl-note">'+s.note+'</div></div>').join('');
+}
+
+function buildFcast(amt,future){
+  const assets=[
+    {id:'g22',ico:'🥇',n:'Gold 22K/g',col:'var(--saffron)',fc:FC_G22,now:G22[CY]},
+    {id:'g22',ico:'🏅',n:'Gold 22K × 8g',col:'var(--saffron)',fc:FC_G22,now:G22[CY]*8,mult:8},
+    {id:'g24',ico:'✨',n:'Gold 24K/g',col:'#9B7428',fc:FC_G24,now:G24[CY]},
+    {id:'land',ico:'🏡',n:'Land / 1 cent',col:'var(--teal)',fc:FC_LAND,now:LAND_CENT[CY]},
+    {id:'usd',ico:'💵',n:'1 USD → INR',col:'var(--navy)',fc:FC_USD,now:USD[CY]},
+  ];
+  const el=document.getElementById('fcastGrid');el.innerHTML='';
+  assets.forEach(a=>{
+    const fi=future-FC0;const raw=(fi>=0&&fi<a.fc.values.length)?a.fc.values[fi]:null;
+    const futV=raw?(a.mult?raw*a.mult:raw):null;
+    const cagr=futV?((Math.pow(futV/a.now,1/Math.max(future-CY,1))-1)*100).toFixed(1):null;
+    const iU=a.id==='usd';const d=document.createElement('div');d.className='fc';
+    d.innerHTML='<div class="fc-head"><span class="fc-ico">'+a.ico+'</span><div class="fc-name" style="color:'+a.col+'">'+a.n+'</div></div>'
+      +'<div class="fc-r"><span class="fc-lbl">Today (2026)</span><span class="fc-val" style="color:'+a.col+'">'+(iU?fUSD(a.now):fR(a.now))+'</span></div>'
+      +'<div class="fc-r"><span class="fc-lbl">In '+future+' (proj.)</span><span class="fc-val" style="color:var(--navy2)">'+(futV?(iU?fUSD(futV):fR(futV)):'—')+'</span></div>'
+      +'<div class="fc-div"></div>'
+      +'<div class="fc-r"><span class="fc-lbl">Historical CAGR</span><span class="fc-val" style="color:var(--teal)">'+(a.fc.cagr*100).toFixed(1)+'% p.a.</span></div>'
+      +(cagr?'<div class="fc-r"><span class="fc-lbl">Proj. CAGR to '+future+'</span><span class="fc-val">'+cagr+'% p.a.</span></div>':'')
+      +'<div class="fc-qty"><div class="fc-qty-h">₹'+amt.toLocaleString('en-IN')+' buys</div>'
+      +'<div class="fc-qty-r"><span class="fc-qty-l">Today</span><span class="fc-qty-v" style="color:var(--saffron)">'+qty(amt,a.now)+'</span></div>'
+      +(futV?'<div class="fc-qty-r"><span class="fc-qty-l">In '+future+'</span><span class="fc-qty-v" style="color:var(--navy2)">'+qty(amt,futV)+'</span></div>':'')+'</div>';
+    el.appendChild(d);
+  });
+}
+
+function buildBeat(avgRate,amt,future){
+  const sip=Math.max(Math.round(amt*0.1/12),500);
+  const gC=(FC_G22.cagr*100).toFixed(1),lC=(FC_LAND.cagr*100).toFixed(1);
+  const rl=Math.max(avgRate-3.2,0).toFixed(1);
+  document.getElementById('beat-rate').textContent=avgRate.toFixed(1)+'%';
+  document.getElementById('beat-sub').textContent='Based on ₹'+amt.toLocaleString('en-IN')+' · avg inflation '+avgRate.toFixed(1)+'% p.a. · Horizon: '+future;
+  const beats=[
+    {e:'📈',t:'Equity SIP — Index Mutual Funds',r:'Historical: 12–14% p.a.',d:'Nifty 50 returned ~13% p.a. since inception — far above '+avgRate.toFixed(1)+'% inflation. A monthly SIP of ₹'+sip.toLocaleString('en-IN')+' compounds powerfully to '+future+'. Use direct plans on Zerodha Coin, Groww, or MFCentral (zero commission).'},
+    {e:'🥇',t:'Sovereign Gold Bonds (SGB)',r:'Gold CAGR: '+gC+'% + 2.5% interest',d:'Gold 22K grew from ₹'+fR(G22[2005])+'/g (2005) → ₹15,000/g (2026), a '+gC+'% CAGR. SGBs give full gold appreciation TAX-FREE on maturity + 2.5% p.a. interest paid semi-annually. No storage cost. Best gold vehicle in India.'},
+    {e:'🏡',t:'Land & Real Estate',r:'Land CAGR: '+lC+'% p.a. (2005–2026)',d:'1 cent of land: '+fR(LAND_CENT[2005])+' (2005) → '+fR(LAND_CENT[CY])+' (2026), a '+lC+'% CAGR. Bengaluru corridors: 14% YoY (NHB 2024). Buy near metro/expressway. REITs offer liquid real estate from ₹300.'},
+    {e:'💵',t:'USD Hedge — Rupee Weakness',r:'Rupee depreciated 108% vs USD since 2005',d:'USD/INR: ₹44 (2005) → ₹91.93 (2026). INR loses ~3% p.a. vs USD structurally. US Index Funds (S&P 500 via Groww/ICICI Pru), international ETFs, and foreign currency FDs protect against rupee erosion while adding global equity returns.'},
+    {e:'🏦',t:'PPF + RBI Floating Rate Bonds',r:'7.1% tax-free (PPF) + inflation-linked',d:'PPF earns 7.1% p.a. tax-free (EEE status). RBI Floating Rate Savings Bonds at 8.05% quarterly adjustment. Both beat idle savings (2.5–3.5%). Ideal for conservative investors or debt allocation in a diversified portfolio.'},
+    {e:'📊',t:'NPS — National Pension System',r:'Market-linked + ₹2L tax deduction',d:'NPS gives ₹1.5L deduction (80C) + additional ₹50K (80CCD1B). Up to 75% equity allocation under age 50 → ~10–12% historical returns. Best retirement vehicle in India with tax arbitrage.'},
+    {e:'⚖️',t:'60-20-20 Diversification Rule',r:'Beats inflation over any 10yr period',d:'60% equity (index funds) + 20% gold (SGBs/ETF) + 20% debt (PPF/bonds/NPS). This blend has outperformed Indian inflation over every rolling 10-year window since 1990. Rebalance annually.'},
+    {e:'🚫',t:'Stop Leaving Cash Idle',r:'Real loss: '+rl+'% p.a. in savings account',d:'Savings accounts pay 2.5–3.5%. With avg inflation '+avgRate.toFixed(1)+'%, idle cash loses '+rl+'% real value every year. ₹'+amt.toLocaleString('en-IN')+' idle for 10 years loses '+fR(amt-amt/Math.pow(1+(Math.max(avgRate-3,0))/100,10))+' in real purchasing power. Even Liquid Funds (6–7%) are better.'},
+  ];
+  document.getElementById('beatCards').innerHTML=beats.map(b=>'<div class="bc2"><div class="bc2-top"><div class="bc2-icon">'+b.e+'</div><div><div class="bc2-title">'+b.t+'</div><div class="bc2-return">'+b.r+'</div></div></div><div class="bc2-desc">'+b.d+'</div></div>').join('');
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter')calculate();});
+</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE & Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+.emacs.desktop
+.emacs.desktop.lock
+
+# Node modules (if using npm)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build & Distribution
+dist/
+build/
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# OS-specific
+.AppleDouble
+.LSOverride
+.TemporaryItems
+
+# Backup files
+*.backup
+*.bak
+*.swp
+~*
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db

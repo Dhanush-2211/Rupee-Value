@@ -1,0 +1,83 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                    ⚡ QUICK DEPLOYMENT GUIDE ⚡                          ║
+║              Make Your Website Live in 5 Minutes!                         ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+🎯 YOUR GOAL:
+   Website URL: https://YOUR_USERNAME.github.io/rupee-value-tracker
+   Status: Goes LIVE right now!
+   Cost: FREE forever
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ WHAT'S READY:
+   ✓ Your HTML website (index.html)
+   ✓ Git repository initialized
+   ✓ All files prepared and committed
+   ✓ Ready to push to GitHub
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🚀 FASTEST WAY - AUTOMATED SCRIPT (RECOMMENDED)
+───────────────────────────────────────────────────────────────────────────
+
+1. Linux/Mac Users:
+   $ bash deploy.sh
+   (Then follow the on-screen prompts)
+
+2. Windows Users:
+   Just double-click: deploy.bat
+   (Then follow the on-screen prompts)
+
+The script will:
+   ✓ Ask for your GitHub username & email
+   ✓ Create the repository on GitHub
+   ✓ Push your code automatically
+   ✓ Tell you what to do next
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔧 MANUAL METHOD (If script doesn't work)
+───────────────────────────────────────────────────────────────────────────
+
+STEP 1: Create GitHub Repo (1 min)
+   1. Go to: https://github.com/new
+   2. Name: rupee-value-tracker
+   3. Visibility: Public
+   4. Click "Create"
+   5. Copy the URL shown
+
+STEP 2: Configure Git (30 sec)
+   git config --global user.name "Your Name"
+   git config --global user.email "your@email.com"
+
+STEP 3: Add Remote (30 sec)
+   git remote add origin https://github.com/YOUR_USERNAME/rupee-value-tracker.git
+
+STEP 4: Push Code (1 min)
+   git branch -M main
+   git push -u origin main
+
+STEP 5: Enable GitHub Pages (1 min)
+   1. Go to repository Settings
+   2. Click "Pages"
+   3. Source: "Deploy from a branch"
+   4. Branch: "main", Folder: "/ (root)"
+   5. Click Save
+   6. Wait 1-2 minutes
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🌐 YOUR WEBSITE IS NOW LIVE!
+   URL: https://YOUR_USERNAME.github.io/rupee-value-tracker
+
+📱 Share this URL with anyone!
+🔄 Updates push automatically (just do: git add . && git commit -m "..." && git push)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+❓ NEED MORE HELP?
+   Read the full guide: DEPLOYMENT.md
+   Complete step-by-step instructions with troubleshooting
+
+═══════════════════════════════════════════════════════════════════════════════
